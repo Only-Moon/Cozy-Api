@@ -220,7 +220,7 @@ exports.execute = async (req, res) => {
     
   res.set({ "Content-Type":  "image/png"})
     
-		const attachment = new Discord.MessageAttachment(
+		
     res.send(canvas.toBuffer())
     
 	} catch (err) {
