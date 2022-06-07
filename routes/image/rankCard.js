@@ -1,10 +1,10 @@
 const { join } = require('path')
 const Canvas = require('canvas')
 const { registerFont } = require('canvas')
-registerFont(join(__dirname, './public/fonts', 'tasty_donuts.otf'), {
+registerFont(join(__dirname, '../../public/fonts', 'tasty_donuts.otf'), {
 	family: 'Poppins-Regular'
 })
-registerFont(join(__dirname, './public/fonts', 'tasty_donuts.otf'), {
+registerFont(join(__dirname, '../../public/fonts', 'tasty_donuts.otf'), {
 	family: 'Poppins-Bold'
 })
 
@@ -37,12 +37,13 @@ exports.execute = async (req, res) => {
 			return result
 		}
     const options = req.query
-    console.log(options)
-		const member = options.member || message.mentions.members.first()?.user || message.author
+    const query = Object.keys(options).length === 0
+    if (!query) return res.json({ error: `Provide following parameters \nuserName - user name\navatarUrl - user avatar url\nbackground - background image url\nboxColor - color for the boxes\nbarColor - level bar color\ncurrentXp - current xp of the user\nneededXp - xp needed for next level` })
+    
 		const canvas = Canvas.createCanvas(1080, 400),
 			ctx = canvas.getContext('2d')
 
-		const name = member.tag
+		const name = options.userName || "moonbow"
 		const noSymbols = string => string.replace(/[\u007f-\uffff]/g, '')
 
 		let BackgroundRadius = '20',
@@ -53,15 +54,15 @@ exports.execute = async (req, res) => {
 			AvatarRoundRadius = '50',
 			DrawLayerColor = '#000000',
 			DrawLayerOpacity = '0.4',
-			BoxColor = options.color || '#096DD1',
-			LevelBarFill = options.LevelBarFill |"#F4B3CA",
+			BoxColor = options.boxColor || '#096DD1',
+			LevelBarFill = options.barColor || "#F4B3CA",
 			LevelBarBackground = '#ffffff',
-			TextEXP = shortener(options.currentXP) + ' xp',
-			LvlText = `Level ${shortener(options.level)}`,
+			TextEXP = shortener(options.currentXP || 10) + ' xp',
+			LvlText = `Level ${shortener(options.level || 1)}`,
 			BarRadius = '20',
 			TextXpNeded = '{current}/{needed}',
-			CurrentXP = options.currentXP,
-			NeededXP = options.neededXP
+			CurrentXP = options.currentXP || 10,
+			NeededXP = options.neededXP || 100
 
 		ctx.beginPath()
 		ctx.moveTo(0 + Number(BackgroundRadius), 0)
@@ -112,9 +113,7 @@ exports.execute = async (req, res) => {
 			ctx.closePath()
 		}
 
-		let avatar = await Canvas.loadImage(
-			member.displayAvatarURL({ dynamic: true, format: 'png' })
-		)
+		let avatar = await Canvas.loadImage(options.avatarUrl || "https://i.imgur.com/At2XO1M.png")
 		ctx.save()
 		RoundedBox(ctx, 40 + 30, 30, 180, 180, Number(AvatarRoundRadius))
 		ctx.strokeStyle = BoxColor
@@ -172,7 +171,7 @@ exports.execute = async (req, res) => {
 		ctx.clip()
 		ctx.fillStyle = '#ffffff'
 		ctx.font = '45px "Poppins-Bold"'
-		ctx.fillText(message.guild.name, 75 + 450, 355)
+		ctx.fillText(options.guildName || "Cozy Development", 75 + 450, 355)
 		ctx.globalAlpha = '0.2'
 		ctx.fillRect(390, 305, 660, 70)
 		ctx.restore()
@@ -227,5 +226,3 @@ exports.execute = async (req, res) => {
 		res.json({ error: `Error Occured. | Cozy-rankCard | Error: ${err.stack}` })
 	}
 }
-
-module.exports = rankCard
