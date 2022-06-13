@@ -6,7 +6,7 @@ const list = [];
 
 let routes = sync(resolve("./routes/**/*.js"));
 
-port = 7000;
+port = process.env.PORT || 7000;
 
 exports.load = function (app) {
   for (const directory of routes) {
