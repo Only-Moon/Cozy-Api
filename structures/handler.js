@@ -31,7 +31,7 @@ exports.load = function (app) {
       (...args) =>
         route.execute(...args).catch((e) => {
           console.log(e);
-          res.send({ error: "internal server error" });
+          app.send({ error: "internal server error" });
         })
     );
   }

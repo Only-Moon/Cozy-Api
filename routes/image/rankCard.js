@@ -26,6 +26,10 @@ registerFont(join(__dirname, '../../public/fonts', 'tasty_donuts.otf'), {
  */
 
 exports.execute = async (req, res) => {
+
+    const query = req.query.image
+    if (!query) return res.json({ error: `Provide a background image url` })
+  
 	try {
 		function shortener(count) {
 			const COUNT_ABBRS = ['', 'k', 'M', 'T']
@@ -36,9 +40,6 @@ exports.execute = async (req, res) => {
 			result += `${COUNT_ABBRS[i]}`
 			return result
 		}
-    const options = req.query
-    const query = Object.keys(options).length === 0
-    if (!query) return res.json({ error: `Provide following parameters \nuserName - user name\navatarUrl - user avatar url\nbackground - background image url\nboxColor - color for the boxes\nbarColor - level bar color\ncurrentXp - current xp of the user\nneededXp - xp needed for next level` })
     
 		const canvas = Canvas.createCanvas(1080, 400),
 			ctx = canvas.getContext('2d')
